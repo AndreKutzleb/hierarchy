@@ -1,13 +1,23 @@
 package de.andre_kutzleb.hierarchy.builder.generators.cpp;
 
+import java.nio.charset.StandardCharsets;
+
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
-public class CppBaseGenerator {
+public abstract class CppBaseGenerator {
 
 	protected final STGroup templates;
 
-	public CppBaseGenerator(STGroup templates) {
+	public CppBaseGenerator() {
+		STGroup templates = new STGroup();
+		
+		STGroup cppGeneral = new STGroupFile("stringtemplate/cpp/cpp_general.stg",StandardCharsets.UTF_8.name(),'$','$');
+		STGroup cppHeader = new STGroupFile("stringtemplate/cpp/cpp_main.stg",StandardCharsets.UTF_8.name(),'$','$');
+		
+		templates.importTemplates(cppGeneral);
+		templates.importTemplates(cppHeader);
 		this.templates = templates;
 	}
 

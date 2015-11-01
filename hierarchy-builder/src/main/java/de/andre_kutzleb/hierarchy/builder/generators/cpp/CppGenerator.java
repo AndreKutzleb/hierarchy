@@ -18,10 +18,6 @@ public class CppGenerator extends CppBaseGenerator{
 	// TODO - long literals may not be interpreted as 64-bit-types when using
 	// versions prior to c++11 ? 
 
-	public CppGenerator(STGroup templates) {
-		super(templates);
-	}
-
 	private final String MSG_TYPE = "zmf::data::MessageType";
 
 
