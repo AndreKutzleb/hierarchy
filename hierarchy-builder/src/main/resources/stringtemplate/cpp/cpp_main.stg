@@ -1,0 +1,44 @@
+MainTemplate (constant) ::= <<
+//
+// Created by zsdn on 10/31/15.
+//
+
+#include <string>
+#include <stdint.h>
+
+class Constants {
+public :
+    $constant; separator="\n"$
+};
+
+template<class T>
+class Appender {
+    bool delBuf;
+protected:
+    std::string* buf = nullptr;
+
+    Appender() : buf(new std::string), delBuf(true) { buf->reserve(Constants::BUFFER_SIZE); }
+
+public:
+
+    Appender(std::string* buf) : buf(buf), delBuf(false) { }
+
+    ~Appender() {
+        if (delBuf) {
+            delete buf;
+        }
+    }
+
+    template<class R>
+    Appender<T>& append(R val) {
+        for (size_t i = ((sizeof(val) - 1) * 8); i > 1; i -= 8) {
+            buf += ((val \>\> i) & 0xff);
+        }
+        return *this;
+    }
+
+    T build() {
+        return T(*buf);
+    }
+};
+>>

@@ -1,0 +1,37 @@
+//import "resources/common.stg"
+
+InitializerList(initializer) 					   ::= "<if(initializer)> : <initializer;separator=\", \"><endif>"
+Include(include)								   ::= "<include:{x |#include \<<x>>};separator=\"\n\">"
+PreProcessor(command)							   ::= "<command:{x |#<x>};separator=\"\n\">"
+
+Constructor(modifier,className,param,initializer,statement) ::= "<WhitespaceAfter(CommaSeparatedList(modifier))><className>(<param; separator=\", \">)<InitializerList(initializer)> {<statement>}"
+
+Class(className,superClass,public,private,protected) ::= <<
+class <className><if(superClass)> : public <superClass><endif> {
+    <VisibilityBlock("private",private)>
+    <VisibilityBlock("protected",protected)>
+    <VisibilityBlock("public",public)>
+};
+>>
+
+VisibilityBlock(level,content) ::= <<
+<if(content)><level>:
+    <content;separator="\n"><endif>
+>>
+
+MainTemplate(header,pre,inc,namespace,inner,footer,constants) ::= <<
+<MultiLineComment(header)>
+
+<PreProcessor(pre)>
+
+<Include(inc)>
+
+namespace <namespace> {
+    <constants;separator="\n">
+    
+    <inner;separator="\n\n">
+
+} <SingleLineComment(namespace)>
+
+<footer>
+>>

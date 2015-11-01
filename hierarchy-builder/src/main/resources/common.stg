@@ -1,0 +1,17 @@
+Declaration(modifier, type, name, value,cast,comment)   ::= "<modifier:{x|<x> }><type> <name><DeclarationAssign(value,cast)>; <SingleLineComment(comment)>"
+DeclarationAssign(initialValue,cast) 	    		   ::= "<if(initialValue)> = <if(cast)>(<cast>) <endif><initialValue><endif>"
+WhitespaceAfter(x) 								   ::= "<if(x)><x> <endif>"
+CommaSeparatedList(element)						   ::= "<element; separator=\", \">"
+SingleLineComment(commentLine) 				       ::= "<if(commentLine)>/** <commentLine> */<endif>"
+Function(modifier,generic,returnType,functionName,param,statement)  ::= "<modifier:{x|<x> }><if(generic)>\<<generic>><endif><returnType> <functionName>(<CommaSeparatedList(param)>) {<statement:{x |<x>;};separator=\"\n\">}"
+Statement(call,cast,param) 						   ::= "<call>(<if(cast)>(<cast>) <endif><param; separator=\",\">);"
+
+MultiLineComment(comment)	::= <<
+/**
+<comment:{x | /* <x>};separator="\n">
+ */
+>>
+
+
+
+

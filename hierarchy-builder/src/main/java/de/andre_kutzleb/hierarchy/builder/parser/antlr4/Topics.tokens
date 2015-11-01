@@ -1,0 +1,16 @@
+HexIntegerLiteral=7
+INDENT=9
+Identifier=5
+LINE_COMMENT=11
+CustomHexIntegerLiteral=8
+T__3=1
+T__2=2
+STRING=12
+T__1=3
+T__0=4
+WS=10
+DecimalIntegerLiteral=6
+'='=4
+';'=3
+'default'=2
+'option'=1
