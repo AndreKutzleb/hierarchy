@@ -24,8 +24,8 @@ public class BaseEntry {
 			this.cppName = cppName;
 			this.appendFunctionName = appendFunctionName;
 		};
-		
-		public String javaNameCamelCase () {
+
+		public String javaNameCamelCase() {
 			return javaName.substring(0, 1).toUpperCase() + javaName.substring(1);
 		}
 	}
@@ -39,22 +39,27 @@ public class BaseEntry {
 		this.name = name;
 		this.comment = comment;
 	}
-	
+
 	public DATA_TYPE getDataType() {
 		return dataType;
 	}
-	
 
 	public String getComment() {
 		return comment;
 	}
 
 	public String getName() {
-		return name;
+		// TO avoid a getter name vs className conflict, make first letter
+		// uppercase if the whole string is lowercase
+		if (name.equals(name.toLowerCase())) {
+			return name.substring(0, 1).toUpperCase() + name.substring(1);
+		} else {
+			return name;
+		}
 	}
-//	public String getUpperCaseName() {
-//		return name.toUpperCase();
-//	}
+	// public String getUpperCaseName() {
+	// return name.toUpperCase();
+	// }
 
 	public String getLowerCaseName() {
 		return name.toLowerCase();

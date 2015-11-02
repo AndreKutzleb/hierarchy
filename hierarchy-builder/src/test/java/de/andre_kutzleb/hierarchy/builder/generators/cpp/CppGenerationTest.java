@@ -19,8 +19,8 @@ public class CppGenerationTest {
 
 	@Before
 	public void setUp() throws Exception {
-		InputStream stream = CppGenerationTest.class.getClassLoader().getResourceAsStream("ExampleModuleA.topics");
-		TopicsFileParser parser = new TopicsFileParser(stream,"ExampleModuleA.topics");
+		InputStream stream = CppGenerationTest.class.getClassLoader().getResourceAsStream("SwitchAdapter.topics");
+		TopicsFileParser parser = new TopicsFileParser(stream,"SwitchAdapter.topics");
 		parser.parseTopicsFile();
 		root = parser.getRoot();
 		options = parser.getOptions();

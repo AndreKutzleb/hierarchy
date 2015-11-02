@@ -1,0 +1,46 @@
+InsideNamespace (constant,builder) ::= <<
+
+class Constants {
+public :
+    $constant; separator="\n"$
+};
+
+template<class T>
+class Appender {
+    bool delBuf;
+protected:
+    std::string* buf = nullptr;
+
+    Appender() : buf(new std::string), delBuf(true) { buf->reserve(Constants::BUFFER_SIZE); }
+
+public:
+
+    Appender(std::string* buf) : buf(buf), delBuf(false) { }
+
+    ~Appender() {
+        if (delBuf) {
+            delete buf;
+        }
+    }
+
+    template<class R>
+    Appender<T>& append(R val) {
+        size_t sizeOfType = sizeof(val);
+        if((buf->length() + sizeOfType) > Constants::BUFFER_SIZE) {
+            throw std::runtime_error("appending given type would exceed buffer size of Builder");
+        }
+        for (; sizeOfType > 0; sizeOfType--) {
+            *buf += (((val \>\> ((sizeOfType-1)*8)) & 0xff));
+        }
+        return *this;
+    }
+
+    T build() {
+        T result = T(*buf);
+        buf->clear();
+        return result;
+    }
+};
+
+$builder$
+>>

@@ -1,0 +1,23 @@
+BuilderClassTop (className,subClass,subClassField,subClassGetter) ::= <<
+template<class T>
+class $className$Builder : public Appender<T> {
+    $subClass;separator="\n"$
+    $subClassField;separator="\n"$
+public:
+	$className$Builder () {}
+	~$className$Builder () {}
+    $subClassGetter;separator="\n"$
+
+};
+>>
+
+BuilderClassSub (className,subClass,subClassField,subClassGetter) ::= <<
+class $className$ : public Appender<T> {
+    $subClass;separator="\n"$
+    using Appender<T>::Appender;
+    $subClassField;separator="\n"$
+$if(subClassGetter)$public:
+    $subClassGetter;separator="\n"$$endif$
+
+};
+>>
