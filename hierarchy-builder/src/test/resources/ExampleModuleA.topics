@@ -1,3 +1,5 @@
+option cpp_namespace_prefix = "example::topics";
+
 TO = 0x01
 	EXAMPLE_MODULE_A = 0xfff2
 		SOME_EVENT = 0x00

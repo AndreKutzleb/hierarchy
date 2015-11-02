@@ -1,4 +1,4 @@
-// Generated from Topics.g4 by ANTLR 4.3
+// Generated from Topics.g4 by ANTLR 4.5.1
 
 package de.andre_kutzleb.hierarchy.builder.parser.antlr4;
 
@@ -13,20 +13,15 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class TopicsParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.3", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.5.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__3=1, T__2=2, T__1=3, T__0=4, Identifier=5, DecimalIntegerLiteral=6, 
+		T__0=1, T__1=2, T__2=3, T__3=4, Identifier=5, DecimalIntegerLiteral=6, 
 		HexIntegerLiteral=7, CustomHexIntegerLiteral=8, INDENT=9, WS=10, LINE_COMMENT=11, 
 		STRING=12;
-	public static final String[] tokenNames = {
-		"<INVALID>", "'option'", "'default'", "';'", "'='", "Identifier", "DecimalIntegerLiteral", 
-		"HexIntegerLiteral", "CustomHexIntegerLiteral", "INDENT", "WS", "LINE_COMMENT", 
-		"STRING"
-	};
 	public static final int
 		RULE_topics = 0, RULE_topicLine = 1, RULE_assign = 2, RULE_custom = 3, 
 		RULE_option = 4;
@@ -34,11 +29,48 @@ public class TopicsParser extends Parser {
 		"topics", "topicLine", "assign", "custom", "option"
 	};
 
-	@Override
-	public String getGrammarFileName() { return "Topics.g4"; }
+	private static final String[] _LITERAL_NAMES = {
+		null, "'='", "'default'", "'option'", "';'"
+	};
+	private static final String[] _SYMBOLIC_NAMES = {
+		null, null, null, null, null, "Identifier", "DecimalIntegerLiteral", "HexIntegerLiteral", 
+		"CustomHexIntegerLiteral", "INDENT", "WS", "LINE_COMMENT", "STRING"
+	};
+	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+	/**
+	 * @deprecated Use {@link #VOCABULARY} instead.
+	 */
+	@Deprecated
+	public static final String[] tokenNames;
+	static {
+		tokenNames = new String[_SYMBOLIC_NAMES.length];
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = VOCABULARY.getLiteralName(i);
+			if (tokenNames[i] == null) {
+				tokenNames[i] = VOCABULARY.getSymbolicName(i);
+			}
+
+			if (tokenNames[i] == null) {
+				tokenNames[i] = "<INVALID>";
+			}
+		}
+	}
 
 	@Override
-	public String[] getTokenNames() { return tokenNames; }
+	@Deprecated
+	public String[] getTokenNames() {
+		return tokenNames;
+	}
+
+	@Override
+
+	public Vocabulary getVocabulary() {
+		return VOCABULARY;
+	}
+
+	@Override
+	public String getGrammarFileName() { return "Topics.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -54,18 +86,18 @@ public class TopicsParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 	public static class TopicsContext extends ParserRuleContext {
-		public TopicLineContext topicLine(int i) {
-			return getRuleContext(TopicLineContext.class,i);
-		}
+		public TerminalNode EOF() { return getToken(TopicsParser.EOF, 0); }
 		public List<TopicLineContext> topicLine() {
 			return getRuleContexts(TopicLineContext.class);
 		}
-		public OptionContext option(int i) {
-			return getRuleContext(OptionContext.class,i);
+		public TopicLineContext topicLine(int i) {
+			return getRuleContext(TopicLineContext.class,i);
 		}
-		public TerminalNode EOF() { return getToken(TopicsParser.EOF, 0); }
 		public List<OptionContext> option() {
 			return getRuleContexts(OptionContext.class);
+		}
+		public OptionContext option(int i) {
+			return getRuleContext(OptionContext.class,i);
 		}
 		public List<TerminalNode> LINE_COMMENT() { return getTokens(TopicsParser.LINE_COMMENT); }
 		public TerminalNode LINE_COMMENT(int i) {
@@ -95,24 +127,27 @@ public class TopicsParser extends Parser {
 			setState(15);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << Identifier) | (1L << INDENT) | (1L << LINE_COMMENT))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << Identifier) | (1L << INDENT) | (1L << LINE_COMMENT))) != 0)) {
 				{
 				setState(13);
 				switch (_input.LA(1)) {
 				case Identifier:
 				case INDENT:
 					{
-					setState(10); topicLine();
+					setState(10);
+					topicLine();
 					}
 					break;
-				case T__3:
+				case T__2:
 					{
-					setState(11); option();
+					setState(11);
+					option();
 					}
 					break;
 				case LINE_COMMENT:
 					{
-					setState(12); match(LINE_COMMENT);
+					setState(12);
+					match(LINE_COMMENT);
 					}
 					break;
 				default:
@@ -123,7 +158,8 @@ public class TopicsParser extends Parser {
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(18); match(EOF);
+			setState(18);
+			match(EOF);
 			}
 		}
 		catch (RecognitionException re) {
@@ -173,18 +209,23 @@ public class TopicsParser extends Parser {
 			_la = _input.LA(1);
 			if (_la==INDENT) {
 				{
-				setState(20); ((TopicLineContext)_localctx).indent = match(INDENT);
+				setState(20);
+				((TopicLineContext)_localctx).indent = match(INDENT);
 				}
 			}
 
-			setState(23); ((TopicLineContext)_localctx).topicName = match(Identifier);
-			setState(24); match(T__0);
-			setState(25); ((TopicLineContext)_localctx).assigned = assign();
+			setState(23);
+			((TopicLineContext)_localctx).topicName = match(Identifier);
+			setState(24);
+			match(T__0);
+			setState(25);
+			((TopicLineContext)_localctx).assigned = assign();
 			setState(27);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				{
-				setState(26); ((TopicLineContext)_localctx).comment = match(LINE_COMMENT);
+				setState(26);
+				((TopicLineContext)_localctx).comment = match(LINE_COMMENT);
 				}
 				break;
 			}
@@ -202,10 +243,10 @@ public class TopicsParser extends Parser {
 	}
 
 	public static class AssignContext extends ParserRuleContext {
+		public TerminalNode HexIntegerLiteral() { return getToken(TopicsParser.HexIntegerLiteral, 0); }
 		public CustomContext custom() {
 			return getRuleContext(CustomContext.class,0);
 		}
-		public TerminalNode HexIntegerLiteral() { return getToken(TopicsParser.HexIntegerLiteral, 0); }
 		public AssignContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -230,12 +271,14 @@ public class TopicsParser extends Parser {
 			switch (_input.LA(1)) {
 			case HexIntegerLiteral:
 				{
-				setState(29); match(HexIntegerLiteral);
+				setState(29);
+				match(HexIntegerLiteral);
 				}
 				break;
 			case CustomHexIntegerLiteral:
 				{
-				setState(30); custom();
+				setState(30);
+				custom();
 				}
 				break;
 			default:
@@ -278,14 +321,18 @@ public class TopicsParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(33); match(CustomHexIntegerLiteral);
+			setState(33);
+			match(CustomHexIntegerLiteral);
 			setState(37);
 			_la = _input.LA(1);
-			if (_la==T__2) {
+			if (_la==T__1) {
 				{
-				setState(34); match(T__2);
-				setState(35); match(T__0);
-				setState(36); match(HexIntegerLiteral);
+				setState(34);
+				match(T__1);
+				setState(35);
+				match(T__0);
+				setState(36);
+				match(HexIntegerLiteral);
 				}
 			}
 
@@ -327,11 +374,16 @@ public class TopicsParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(39); match(T__3);
-			setState(40); ((OptionContext)_localctx).optionName = match(Identifier);
-			setState(41); match(T__0);
-			setState(42); ((OptionContext)_localctx).optionValue = match(STRING);
-			setState(43); match(T__1);
+			setState(39);
+			match(T__2);
+			setState(40);
+			((OptionContext)_localctx).optionName = match(Identifier);
+			setState(41);
+			match(T__0);
+			setState(42);
+			((OptionContext)_localctx).optionValue = match(STRING);
+			setState(43);
+			match(T__3);
 			}
 		}
 		catch (RecognitionException re) {
@@ -354,11 +406,11 @@ public class TopicsParser extends Parser {
 		"\4\3\2\r\20\5\n\6\2\16\20\7\r\2\2\17\f\3\2\2\2\17\r\3\2\2\2\17\16\3\2"+
 		"\2\2\20\23\3\2\2\2\21\17\3\2\2\2\21\22\3\2\2\2\22\24\3\2\2\2\23\21\3\2"+
 		"\2\2\24\25\7\2\2\3\25\3\3\2\2\2\26\30\7\13\2\2\27\26\3\2\2\2\27\30\3\2"+
-		"\2\2\30\31\3\2\2\2\31\32\7\7\2\2\32\33\7\6\2\2\33\35\5\6\4\2\34\36\7\r"+
+		"\2\2\30\31\3\2\2\2\31\32\7\7\2\2\32\33\7\3\2\2\33\35\5\6\4\2\34\36\7\r"+
 		"\2\2\35\34\3\2\2\2\35\36\3\2\2\2\36\5\3\2\2\2\37\"\7\t\2\2 \"\5\b\5\2"+
-		"!\37\3\2\2\2! \3\2\2\2\"\7\3\2\2\2#\'\7\n\2\2$%\7\4\2\2%&\7\6\2\2&(\7"+
-		"\t\2\2\'$\3\2\2\2\'(\3\2\2\2(\t\3\2\2\2)*\7\3\2\2*+\7\7\2\2+,\7\6\2\2"+
-		",-\7\16\2\2-.\7\5\2\2.\13\3\2\2\2\b\17\21\27\35!\'";
+		"!\37\3\2\2\2! \3\2\2\2\"\7\3\2\2\2#\'\7\n\2\2$%\7\4\2\2%&\7\3\2\2&(\7"+
+		"\t\2\2\'$\3\2\2\2\'(\3\2\2\2(\t\3\2\2\2)*\7\5\2\2*+\7\7\2\2+,\7\3\2\2"+
+		",-\7\16\2\2-.\7\6\2\2.\13\3\2\2\2\b\17\21\27\35!\'";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

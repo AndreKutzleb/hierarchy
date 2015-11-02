@@ -29,7 +29,7 @@ public class CppGenerationTest {
 	@Test
 	public void test() {
 		CppGenerator cppGenerator = new CppGenerator();
-		String generateCppFile = cppGenerator.generateCppFile(root);
+		String generateCppFile = cppGenerator.generateCppFile(root,options);
 		System.out.println(generateCppFile);
 	}
 

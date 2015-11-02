@@ -1,6 +1,6 @@
-Constant(type,name,value) ::= "static const $type$ $name$ = $value$;"
+Constant(type,name,value) ::= "static const $type$ $name$ = 0x$value$;"
 
-SubClassField(class,name) ::= "$class$ $name$ = $class$(this->buf);"
+SubClassField(class,name) ::= "$class$ $name$_ = $class$(this->buf);"
 
 SubClassGetter(class,name,param,value) ::= <<
 $class$& $name$($param$) {
@@ -8,4 +8,20 @@ $class$& $name$($param$) {
     return $name$_;
 }>>
 
-SubClassGetterConst(class,name,value) ::= "$SubClassGetter(class,name,name,value)$"
+SubClassGetterConst(class,name,constantName) ::= <<
+$class$& $name$() {
+    this->append(Constants::$constantName$);
+    return $name$_;
+}>>
+
+SubClassGetterDefault(class,name,constantName) ::= <<
+$class$& $name$_default() {
+    this->append(Constants::$constantName$);
+    return $name$_;
+}>>
+
+SubClassGetterCustom(class,name,paramType) ::= <<
+$class$& $name$($paramType$ val) {
+    this->append(val);
+    return $name$_;
+}>>
