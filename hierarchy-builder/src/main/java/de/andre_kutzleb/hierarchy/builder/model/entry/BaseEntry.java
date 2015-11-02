@@ -52,9 +52,9 @@ public class BaseEntry {
 	public String getName() {
 		return name;
 	}
-	public String getUpperCaseName() {
-		return name.toUpperCase();
-	}
+//	public String getUpperCaseName() {
+//		return name.toUpperCase();
+//	}
 
 	public String getLowerCaseName() {
 		return name.toLowerCase();

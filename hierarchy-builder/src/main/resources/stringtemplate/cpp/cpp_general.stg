@@ -1,1 +1,11 @@
-Constant(type,name,value) ::= "public static $type$ $name$;"
+Constant(type,name,value) ::= "static const $type$ $name$ = $value$;"
+
+SubClassField(class,name) ::= "$class$ $name$ = $class$(this->buf);"
+
+SubClassGetter(class,name,param,value) ::= <<
+$class$& $name$($param$) {
+    this->append($value$);
+    return $name$_;
+}>>
+
+SubClassGetterConst(class,name,value) ::= "$SubClassGetter(class,name,name,value)$"

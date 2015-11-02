@@ -1,4 +1,4 @@
-MainTemplate (constant) ::= <<
+MainTemplate (constant,builder) ::= <<
 //
 // Created by zsdn on 10/31/15.
 //
@@ -41,4 +41,6 @@ public:
         return T(*buf);
     }
 };
+
+$builder$
 >>
