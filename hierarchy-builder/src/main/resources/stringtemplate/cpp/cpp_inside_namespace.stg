@@ -9,36 +9,39 @@ template<class T>
 class Appender {
     bool delBuf;
 protected:
-    std::string* buf = nullptr;
+    uint8_t* buf;
+    size_t* currentSize;
 
-    Appender() : buf(new std::string), delBuf(true) { buf->reserve(Constants::BUFFER_SIZE); }
+    Appender() : buf(new uint8_t[Constants::BUFFER_SIZE]),currentSize(new size_t(0)), delBuf(true) {}
 
 public:
 
-    Appender(std::string* buf) : buf(buf), delBuf(false) { }
+    Appender(uint8_t* buf, size_t* currentSize) : buf(buf),currentSize(currentSize), delBuf(false) {}
 
     ~Appender() {
         if (delBuf) {
             delete buf;
+            delete currentSize;
         }
     }
 
     template<class R>
     Appender<T>& append(R val) {
         size_t sizeOfType = sizeof(val);
-        if((buf->length() + sizeOfType) > Constants::BUFFER_SIZE) {
+        if((*currentSize + sizeOfType) >= Constants::BUFFER_SIZE) {
             throw std::runtime_error("appending given type would exceed buffer size of Builder");
         }
         for (; sizeOfType > 0; sizeOfType--) {
-            *buf += (((val \>\> ((sizeOfType-1)*8)) & 0xff));
+            size_t currentIndex = *currentSize;
+            buf[(*currentSize)++] = ((val \>\> ((sizeOfType-1)*8)) & 0xff);
         }
         return *this;
     }
 
     T build() {
-        T result = T(*buf);
-        buf->clear();
-        return result;
+        size_t now = *currentSize;
+        *currentSize = 0;
+        return T(std::string((char*)buf, now));
     }
 };
 

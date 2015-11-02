@@ -1,6 +1,6 @@
 Constant(type,name,value) ::= "static const $type$ $name$ = $value$;"
 
-SubClassField(class,name) ::= "$class$ $name$_ = $class$(this->buf);"
+SubClassField(class,name) ::= "$class$ $name$_ = $class$(this->buf, this->currentSize);"
 
 SubClassGetter(class,name,param,value) ::= <<
 $class$& $name$($param$) {
