@@ -20,7 +20,7 @@ public:
 
     ~Appender() {
         if (delBuf) {
-            delete buf;
+            delete[] buf;
             delete currentSize;
         }
     }
