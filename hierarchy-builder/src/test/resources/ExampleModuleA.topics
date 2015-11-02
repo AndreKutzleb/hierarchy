@@ -1,4 +1,5 @@
-option cpp_namespace_prefix = "example::topics";
+option cpp_namespace = "zsdn::modules";
+option buffer_size = "32";
 
 TO = 0x01
 	EXAMPLE_MODULE_A = 0xfff2

@@ -1,11 +1,12 @@
 package de.andre_kutzleb.hierarchy.builder.generators.cpp;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
-import javax.naming.InitialContext;
-
-import org.omg.CosNaming.IstringHelper;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -28,6 +29,7 @@ public class CppGenerator {
 
 	private static final String CPP_FILES_PATH = "stringtemplate/cpp/";
 	private static final String CHARSET = StandardCharsets.UTF_8.name();
+	private static final String DEFAULT_BUFFER_SIZE = "512";
 	private static final char DELIMITER = '$';
 
 	private final STGroup templates;
@@ -45,7 +47,7 @@ public class CppGenerator {
 		}
 	}
 
-	protected String constant(String type, String name, String value) {
+	private String constant(String type, String name, String value) {
 		ST constant = templates.getInstanceOf("Constant");
 		constant.add("type", type);
 		constant.add("name", name);
@@ -53,7 +55,11 @@ public class CppGenerator {
 		return constant.render();
 	}
 
-	protected String subClassField(BaseEntry data) {
+	private String constantHex(String type, String name, String value) {
+		return constant(type, name, "0x" + value);
+	}
+
+	private String subClassField(BaseEntry data) {
 		ST subClassField = templates.getInstanceOf("SubClassField");
 		subClassField.add("class", data.getName());
 		subClassField.add("name", data.getLowerCaseName());
@@ -84,11 +90,11 @@ public class CppGenerator {
 	private void fillConstants(ST insideNamespace, BaseEntry entry) {
 		if (entry instanceof ConstantValueEntry) {
 			ConstantValueEntry constantEntry = (ConstantValueEntry) entry;
-			insideNamespace.add("constant", constant(entry.getDataType().cppName, constantEntry.getConstantValueName(), constantEntry.getConstantValue()));
+			insideNamespace.add("constant", constantHex(entry.getDataType().cppName, constantEntry.getConstantValueName(), constantEntry.getConstantValue()));
 		}
 		if (entry instanceof DefaultValueEntry) {
 			DefaultValueEntry defaultEntry = (DefaultValueEntry) entry;
-			insideNamespace.add("constant", constant(entry.getDataType().cppName, defaultEntry.getDefaultValueName(), defaultEntry.getDefaultValue()));
+			insideNamespace.add("constant", constantHex(entry.getDataType().cppName, defaultEntry.getDefaultValueName(), defaultEntry.getDefaultValue()));
 		}
 	}
 
@@ -124,22 +130,47 @@ public class CppGenerator {
 		mainTemplate.add("define", root.data.getName());
 
 		ST insideNamespace = this.templates.getInstanceOf("InsideNamespace");
-		insideNamespace.add("constant", constant(DATA_TYPE.uint32_t.cppName, "BUFFER_SIZE", "512"));
+		insideNamespace.add("constant", constant(DATA_TYPE.uint32_t.cppName, "BUFFER_SIZE", getBufferSize(options)));
 		insideNamespace.add("builder", fillRecursive(root, insideNamespace));
-		mainTemplate.add("insideNamespace", insideNamespace.render());
 
-		mainTemplate.add("namespace", getNamespace(root.data, options));
+		List<String> namespacesReverse = getNamespacesReverse(options);
+		if (namespacesReverse.isEmpty()) {
+			mainTemplate.add("insideNamespace", insideNamespace.render());
+		} else {
+			ST lastNamespace = this.templates.getInstanceOf("Namespace");
+			lastNamespace.add("namespace", namespacesReverse.get(0));
+			lastNamespace.add("content", insideNamespace.render());
+			// if necessary, put the intermediate result into the next bigger
+			// namespace
+			for (int i = 1; i < namespacesReverse.size(); i++) {
+				ST currentNamespace = this.templates.getInstanceOf("Namespace");
+				currentNamespace.add("namespace", namespacesReverse.get(i));
+				currentNamespace.add("content", lastNamespace.render());
+				lastNamespace = currentNamespace;
+			}
+			mainTemplate.add("insideNamespace", lastNamespace.render());
+		}
 
 		return mainTemplate.render();
 	}
 
-	private String getNamespace(BaseEntry rootEntry, Map<String, String> options) {
-
-		String optNamespace = options.get("cpp_namespace_prefix");
-		if (optNamespace == null) {
-			return rootEntry.getName();
+	private String getBufferSize(Map<String, String> options) {
+		String bufferSize = options.get("buffer_size");
+		if (bufferSize == null) {
+			return DEFAULT_BUFFER_SIZE;
 		} else {
-			return optNamespace + "::" + rootEntry.getName() + "Topics";
+			return bufferSize;
+		}
+	}
+
+	private List<String> getNamespacesReverse(Map<String, String> options) {
+		String namespaces = options.get("cpp_namespace");
+		if (namespaces == null) {
+			return Collections.emptyList();
+		} else {
+			List<String> asList = Arrays.asList(namespaces.split(Pattern.quote("::")));
+			Collections.reverse(asList);
+			return asList;
 		}
 	}
 }
