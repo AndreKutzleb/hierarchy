@@ -1,1 +1,3 @@
-/target/
+hierarchy-builder/target
+.project
+.classpath
