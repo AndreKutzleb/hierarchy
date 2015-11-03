@@ -135,9 +135,9 @@ public class Main {
 	private static String getJavaOutFileName(Map<String, String> options, Node<BaseEntry> node) {
 		String name = options.get("java_output_file_name");
 		if (name == null) {
-			return node.data.getName() + "Builder.java";
+			return node.data.getName() + "Topics.java";
 		} else {
-			return name + "Builder.java";
+			return name + "Topics.java";
 		}
 	}
 	
