@@ -40,7 +40,7 @@ public class Main {
 		ParameterDefinition jct = new ParameterDefinition();
 		JCommander jCommander = new JCommander(jct);
 		try {
-			jCommander.parse(argv);
+			jCommander.parse(args);
 		} catch (ParameterException pe) {
 			jCommander.usage();
 			return;
