@@ -117,7 +117,7 @@ public class JavaGenerator {
 
 		ST mainTemplate = this.templates.getInstanceOf("Outer");
 		mainTemplate.add("package", options.get("java_package"));
-		mainTemplate.add("className", root.data.getName()+"Builder");
+		mainTemplate.add("className", root.data.getName()+"Topics");
 		mainTemplate.add("constant", constant(DATA_TYPE.uint32_t.javaName, "BUFFER_SIZE", getBufferSize(options)));
 		mainTemplate.add("builder", fillRecursive(root, mainTemplate));
 		return mainTemplate.render();
