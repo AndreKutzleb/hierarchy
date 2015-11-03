@@ -1,3 +1,5 @@
 hierarchy-builder/target
 .project
 .classpath
+.idea
+.settings
