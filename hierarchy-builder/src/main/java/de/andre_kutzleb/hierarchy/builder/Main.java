@@ -37,7 +37,7 @@ public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
 
 		// TODO
-		args = new String[]{ "-l", "cpp", "-s", "/home/zsdn/module_interface_definitions/topics/SwitchRegistryModule.topics", "-r", "-o", "/home/zsdn/testout/", "-j", "test.bla.bla", "-c" , "zsdn::modules"};
+		//args = new String[]{ "-l", "java", "-s", "/home/zsdn/module_interface_definitions/topics/SwitchRegistryModule.topics", "-r", "-o", "/home/zsdn/testout/", "-j", "test.bla.bla", "-c" , "zsdn::modules"};
 
 		ParameterDefinition jct = new ParameterDefinition();
 		JCommander jCommander = new JCommander(jct);
@@ -105,7 +105,6 @@ public class Main {
 			case "cpp": {
 				CppGenerator generator = new CppGenerator();
 				String generateCppFile = generator.generateCppFile(parser.getRoot(), options);
-				System.out.println(generateCppFile);
 				// FIXME
 				File outDir = new File(outputFolder + File.separator);
 				outDir.mkdirs();
@@ -116,7 +115,6 @@ public class Main {
 			case "java": {
 				JavaGenerator generator = new JavaGenerator();
 				String generateCppFile = generator.generateJavaFile(parser.getRoot(), options);
-				System.out.println(generateCppFile);
 				File outDir = new File(outputFolder + File.separator);
 				outDir.mkdirs();
 				File outFile = new File(outDir.getAbsoluteFile() + File.separator + getJavaOutFileName(options, parser.getRoot()));
