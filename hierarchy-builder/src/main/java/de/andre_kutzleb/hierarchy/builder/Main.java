@@ -144,9 +144,9 @@ public class Main {
 	private static String getCppOutFileName(Map<String, String> options, Node<BaseEntry> node) {
 		String name = options.get("cpp_output_file_name");
 		if (name == null) {
-			return node.data.getName() + ".hpp";
+			return node.data.getName() + "Topics.hpp";
 		} else {
-			return name + ".hpp";
+			return name + "Topics.hpp";
 		}
 	}
 
