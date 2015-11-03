@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
@@ -27,6 +26,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 import de.andre_kutzleb.hierarchy.builder.generators.cpp.CppGenerator;
+import de.andre_kutzleb.hierarchy.builder.generators.cpp.JavaGenerator;
 import de.andre_kutzleb.hierarchy.builder.model.entry.BaseEntry;
 import de.andre_kutzleb.hierarchy.builder.model.tree.Node;
 import de.andre_kutzleb.hierarchy.builder.parser.TopicsFileParser;
@@ -35,7 +35,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
 
-		String[] argv = { "-lang", "cpp", "-src", "/home/zsdn/zsdn-git/module_interface_definitions/", "-r", "-out", "/home/zsdn/testout/" };
+		String[] argv = { "-lang", "java", "-src", "/home/zsdn/zsdn-git/module_interface_definitions/", "-r", "-out", "/home/zsdn/testout/" };
 
 		ParameterDefinition jct = new ParameterDefinition();
 		JCommander jCommander = new JCommander(jct);
@@ -98,7 +98,13 @@ public class Main {
 				break;
 			}
 			case "java": {
-				throw new UnsupportedOperationException("NIY");
+				JavaGenerator generator = new JavaGenerator();
+				String generateCppFile = generator.generateJavaFile(parser.getRoot(), parser.getOptions());
+				File outDir = new File(outputFolder + File.separator);
+				outDir.mkdirs();
+				File outFile = new File(outDir.getAbsoluteFile() + File.separator + getJavaOutFileName(parser.getOptions(), parser.getRoot()));
+				Files.write(outFile.toPath(), generateCppFile.getBytes(StandardCharsets.UTF_8));
+				break;
 			}
 			default:
 				throw new IllegalArgumentException("unknown language: " + language);
@@ -111,8 +117,17 @@ public class Main {
 
 	}
 
+	private static String getJavaOutFileName(Map<String, String> options, Node<BaseEntry> node) {
+		String name = options.get("java_output_file_name");
+		if (name == null) {
+			return node.data.getName() + "Builder.java";
+		} else {
+			return name + "Builder.java";
+		}
+	}
+	
 	private static String getCppOutFileName(Map<String, String> options, Node<BaseEntry> node) {
-		String name = options.get("output_file_name");
+		String name = options.get("cpp_output_file_name");
 		if (name == null) {
 			return node.data.getName() + ".cpp";
 		} else {

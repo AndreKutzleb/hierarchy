@@ -2,12 +2,6 @@ Constant(type,name,value) ::= "static const $type$ $name$ = $value$;"
 
 SubClassField(class,name) ::= "$class$ $name$_ = $class$(this->buf, this->currentSize);"
 
-SubClassGetter(class,name,param,value) ::= <<
-$class$& $name$($param$) {
-    this->append($value$);
-    return $name$_;
-}>>
-
 SubClassGetterConst(class,name,constantName) ::= <<
 $class$& $name$() {
     this->append(Constants::$constantName$);

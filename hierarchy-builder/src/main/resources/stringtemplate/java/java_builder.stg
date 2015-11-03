@@ -1,0 +1,7 @@
+BuilderClass (className,subClass,subClassField,subClassGetter) ::= <<
+public class $className$ extends Appender {
+    $subClass;separator="\n"$
+    $subClassField;separator="\n"$
+    $subClassGetter;separator="\n"$
+};
+>>
