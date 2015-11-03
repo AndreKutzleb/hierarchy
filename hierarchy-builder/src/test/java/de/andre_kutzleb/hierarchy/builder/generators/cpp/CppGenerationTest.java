@@ -8,6 +8,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.andre_kutzleb.hierarchy.builder.generators.CppGenerator;
 import de.andre_kutzleb.hierarchy.builder.model.entry.BaseEntry;
 import de.andre_kutzleb.hierarchy.builder.model.tree.Node;
 import de.andre_kutzleb.hierarchy.builder.parser.TopicsFileParser;

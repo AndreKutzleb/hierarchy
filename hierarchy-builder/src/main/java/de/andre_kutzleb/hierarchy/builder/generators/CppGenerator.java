@@ -1,4 +1,4 @@
-package de.andre_kutzleb.hierarchy.builder.generators.cpp;
+package de.andre_kutzleb.hierarchy.builder.generators;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -22,24 +22,27 @@ import de.andre_kutzleb.hierarchy.builder.model.tree.Node;
  *
  * @author Andre Kutzleb
  */
-public class JavaGenerator {
+public class CppGenerator {
 
-	private static final String JAVA_FILES_PATH = "stringtemplate/java/";
+	// TODO - long literals may not be interpreted as 64-bit-types when using
+	// versions prior to c++11 ?
+
+	private static final String CPP_FILES_PATH = "stringtemplate/cpp/";
 	private static final String CHARSET = StandardCharsets.UTF_8.name();
 	private static final String DEFAULT_BUFFER_SIZE = "512";
 	private static final char DELIMITER = '$';
 
 	private final STGroup templates;
 
-	public JavaGenerator() {
+	public CppGenerator() {
 		STGroup templates = new STGroup();
-		importGroupFile(templates,"java_general", "java_outer", "java_builder");
+		importGroupFile(templates, "cpp_general", "cpp_inside_namespace", "cpp_outside_namespace", "cpp_builder");
 		this.templates = templates;
 	}
 
 	private void importGroupFile(STGroup into, String... toLoad) {
 		for (String file : toLoad) {
-			STGroup loaded = new STGroupFile(JAVA_FILES_PATH + file + ".stg", CHARSET, DELIMITER, DELIMITER);
+			STGroup loaded = new STGroupFile(CPP_FILES_PATH + file + ".stg", CHARSET, DELIMITER, DELIMITER);
 			into.importTemplates(loaded);
 		}
 	}
@@ -65,9 +68,10 @@ public class JavaGenerator {
 
 	private String fillRecursive(Node<BaseEntry> node, ST insideNamespace) {
 
-		ST clazz = templates.getInstanceOf("BuilderClass");
+		ST clazz = getBuilderClassTemplate(node.isRoot);
 
-		clazz.add("className", node.isRoot ? "Instance" : node.data.getName());
+		clazz.add("mainClassName", node.getRoot().data.getName());
+		clazz.add("className", node.data.getName());
 
 		for (Node<BaseEntry> child : node.children) {
 			String subClass = fillRecursive(child, insideNamespace);
@@ -79,14 +83,19 @@ public class JavaGenerator {
 		return clazz.render();
 	}
 
+	private ST getBuilderClassTemplate(boolean isRoot) {
+		String templateName = isRoot ? "BuilderClassTop" : "BuilderClassSub";
+		return this.templates.getInstanceOf(templateName);
+	}
+
 	private void fillConstants(ST insideNamespace, BaseEntry entry) {
 		if (entry instanceof ConstantValueEntry) {
 			ConstantValueEntry constantEntry = (ConstantValueEntry) entry;
-			insideNamespace.add("constant", constantHex(entry.getDataType().javaName, constantEntry.getConstantValueName(), constantEntry.getConstantValue()));
+			insideNamespace.add("constant", constantHex(entry.getDataType().cppName, constantEntry.getConstantValueName(), constantEntry.getConstantValue()));
 		}
 		if (entry instanceof DefaultValueEntry) {
 			DefaultValueEntry defaultEntry = (DefaultValueEntry) entry;
-			insideNamespace.add("constant", constantHex(entry.getDataType().javaName, defaultEntry.getDefaultValueName(), defaultEntry.getDefaultValue()));
+			insideNamespace.add("constant", constantHex(entry.getDataType().cppName, defaultEntry.getDefaultValueName(), defaultEntry.getDefaultValue()));
 		}
 	}
 
@@ -96,34 +105,55 @@ public class JavaGenerator {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterConst");
 			subClassGetter.add("class", node.data.getName());
 			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("mainClassName", node.getRoot().data.getName());
 			subClassGetter.add("constantName", ((ConstantValueEntry) node.data).getConstantValueName());
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
-		
 		if (node.data instanceof CustomValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterCustom");
 			subClassGetter.add("class", node.data.getName());
 			subClassGetter.add("name", node.data.getLowerCaseName());
-			subClassGetter.add("paramType", node.data.getDataType().javaName);
-
+			subClassGetter.add("paramType", node.data.getDataType().cppName);
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
 		if (node.data instanceof DefaultValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterDefault");
 			subClassGetter.add("class", node.data.getName());
 			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("mainClassName", node.getRoot().data.getName());
 			subClassGetter.add("constantName", ((DefaultValueEntry) node.data).getDefaultValueName());
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
 	}
 
-	public String generateJavaFile(Node<BaseEntry> root, Map<String, String> options) {
+	public String generateCppFile(Node<BaseEntry> root, Map<String, String> options) {
 
-		ST mainTemplate = this.templates.getInstanceOf("Outer");
-		mainTemplate.add("package", options.get("java_package"));
-		mainTemplate.add("className", root.data.getName()+"Builder");
-		mainTemplate.add("constant", constant(DATA_TYPE.uint32_t.javaName, "BUFFER_SIZE", getBufferSize(options)));
-		mainTemplate.add("builder", fillRecursive(root, mainTemplate));
+		ST mainTemplate = this.templates.getInstanceOf("OutsideNamespace");
+		mainTemplate.add("define", root.data.getName());
+
+		ST insideNamespace = this.templates.getInstanceOf("InsideNamespace");
+		insideNamespace.add("constant", constant(DATA_TYPE.uint32_t.cppName, "BUFFER_SIZE", getBufferSize(options)));
+		insideNamespace.add("className", root.data.getName());
+		insideNamespace.add("builder", fillRecursive(root, insideNamespace));
+
+		List<String> namespacesReverse = getNamespacesReverse(options);
+		if (namespacesReverse.isEmpty()) {
+			mainTemplate.add("insideNamespace", insideNamespace.render());
+		} else {
+			ST lastNamespace = this.templates.getInstanceOf("Namespace");
+			lastNamespace.add("namespace", namespacesReverse.get(0));
+			lastNamespace.add("content", insideNamespace.render());
+			// if necessary, put the intermediate result into the next bigger
+			// namespace
+			for (int i = 1; i < namespacesReverse.size(); i++) {
+				ST currentNamespace = this.templates.getInstanceOf("Namespace");
+				currentNamespace.add("namespace", namespacesReverse.get(i));
+				currentNamespace.add("content", lastNamespace.render());
+				lastNamespace = currentNamespace;
+			}
+			mainTemplate.add("insideNamespace", lastNamespace.render());
+		}
+
 		return mainTemplate.render();
 	}
 
@@ -134,5 +164,36 @@ public class JavaGenerator {
 		} else {
 			return bufferSize;
 		}
+	}
+
+	private List<String> getNamespacesReverse(Map<String, String> options) {
+		String inner = options.get("cpp_inner_namespace");
+		String outer = options.get("cpp_outer_namespace");
+
+		String innerNamespaces = inner == null ? "" : inner;
+		String outerNamespaces = outer == null ? "" : outer;
+
+		boolean innerAvail = !innerNamespaces.isEmpty();
+		boolean outerAvail = !outerNamespaces.isEmpty();
+		boolean bothAvail = innerAvail && outerAvail;
+		boolean anyAvail = innerAvail || outerAvail;
+
+		if (!anyAvail) {
+			return Collections.emptyList();
+		}
+
+		String allNamespaces;
+		if (bothAvail) {
+			allNamespaces = outerNamespaces + "::" + innerNamespaces;
+		} else if (innerAvail) {
+			allNamespaces = innerNamespaces;
+		} else {
+			allNamespaces = outerNamespaces;
+		}
+
+		List<String> asList = Arrays.asList(allNamespaces.split(Pattern.quote("::")));
+		Collections.reverse(asList);
+		return asList;
+
 	}
 }

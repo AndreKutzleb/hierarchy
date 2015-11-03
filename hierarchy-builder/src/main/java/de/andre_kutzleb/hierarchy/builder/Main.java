@@ -26,8 +26,8 @@ import org.apache.commons.io.FileUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
-import de.andre_kutzleb.hierarchy.builder.generators.cpp.CppGenerator;
-import de.andre_kutzleb.hierarchy.builder.generators.cpp.JavaGenerator;
+import de.andre_kutzleb.hierarchy.builder.generators.CppGenerator;
+import de.andre_kutzleb.hierarchy.builder.generators.JavaGenerator;
 import de.andre_kutzleb.hierarchy.builder.model.entry.BaseEntry;
 import de.andre_kutzleb.hierarchy.builder.model.tree.Node;
 import de.andre_kutzleb.hierarchy.builder.parser.TopicsFileParser;

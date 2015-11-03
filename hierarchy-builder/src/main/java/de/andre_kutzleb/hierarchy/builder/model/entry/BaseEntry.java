@@ -1,11 +1,5 @@
 package de.andre_kutzleb.hierarchy.builder.model.entry;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
 /**
  *
  * @author Andre Kutzleb
