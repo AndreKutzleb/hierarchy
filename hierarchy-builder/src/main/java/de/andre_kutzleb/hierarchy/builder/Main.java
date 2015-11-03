@@ -35,7 +35,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
 
-		String[] argv = { "-lang", "java", "-src", "/home/zsdn/zsdn-git/module_interface_definitions/", "-r", "-out", "/home/zsdn/testout/" };
+		//String[] argv = { "-lang", "java", "-src", "/home/zsdn/zsdn-git/module_interface_definitions/", "-r", "-out", "/home/zsdn/testout/" };
 
 		ParameterDefinition jct = new ParameterDefinition();
 		JCommander jCommander = new JCommander(jct);
