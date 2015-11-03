@@ -1,20 +1,20 @@
-BuilderClassTop (className,subClass,subClassField,subClassGetter) ::= <<
+BuilderClassTop (className,mainClassName,subClass,subClassField,subClassGetter) ::= <<
 template<class T>
-class $className$Builder : public Appender<T> {
+class $mainClassName$Topics : public $mainClassName$TopicsAppender<T> {
     $subClass;separator="\n"$
     $subClassField;separator="\n"$
 public:
-	$className$Builder () {}
-	~$className$Builder () {}
+	$mainClassName$Topics () {}
+	~$mainClassName$Topics () {}
     $subClassGetter;separator="\n"$
 
 };
 >>
 
-BuilderClassSub (className,subClass,subClassField,subClassGetter) ::= <<
-class $className$ : public Appender<T> {
+BuilderClassSub (className,mainClassName,subClass,subClassField,subClassGetter) ::= <<
+class $className$ : public $mainClassName$TopicsAppender<T> {
     $subClass;separator="\n"$
-    using Appender<T>::Appender;
+    using $mainClassName$TopicsAppender<T>::$mainClassName$TopicsAppender;
     $subClassField;separator="\n"$
 $if(subClassGetter)$public:
     $subClassGetter;separator="\n"$$endif$

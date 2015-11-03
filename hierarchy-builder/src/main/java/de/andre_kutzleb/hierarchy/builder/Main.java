@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
@@ -35,23 +36,32 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
 
-		//String[] argv = { "-lang", "java", "-src", "/home/zsdn/zsdn-git/module_interface_definitions/", "-r", "-out", "/home/zsdn/testout/" };
+		// TODO
+		args = new String[]{ "-l", "cpp", "-s", "/home/zsdn/module_interface_definitions/topics/SwitchRegistryModule.topics", "-r", "-o", "/home/zsdn/testout/", "-j", "test.bla.bla", "-c" , "zsdn::modules"};
 
 		ParameterDefinition jct = new ParameterDefinition();
 		JCommander jCommander = new JCommander(jct);
 		try {
 			jCommander.parse(args);
 		} catch (ParameterException pe) {
+			System.err.println(pe.getMessage());
 			jCommander.usage();
 			return;
 		}
 
 		List<File> foundTopicsFiles = collectAll(jct.sources, jct.recursive);
+		Map<String,String> globalOptions = new HashMap<>();
+		if(jct.javaPackageName != null) {
+			globalOptions.put("java_package", jct.javaPackageName);
+		}
+		if(jct.cppOuterNamespace != null) {
+			globalOptions.put("cpp_outer_namespace", jct.cppOuterNamespace);
+		}
 
 		if (foundTopicsFiles.isEmpty()) {
 			System.out.println("No files found to process in given source directives. Aborting.");
 		} else {
-			process(foundTopicsFiles, jct.buildThreads, jct.language, jct.outputFolder);
+			process(foundTopicsFiles, jct.buildThreads, jct.language, jct.outputFolder,globalOptions);
 		}
 
 		// System.out.println(jct.groups);
@@ -59,7 +69,7 @@ public class Main {
 		// cppGen.generateCppFile(root);
 	}
 
-	private static void process(List<File> foundTopicsFiles, int buildThreads, String language, String outputFolder) throws InterruptedException, ExecutionException {
+	private static void process(List<File> foundTopicsFiles, int buildThreads, String language, String outputFolder, Map<String, String> globalOptions) throws InterruptedException, ExecutionException {
 		ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(buildThreads);
 		try {
 
@@ -69,7 +79,7 @@ public class Main {
 			}
 			List<Future<?>> completionHandles = new ArrayList<>();
 			for (File f : foundTopicsFiles) {
-				Future<?> completionHandle = newFixedThreadPool.submit(() -> processSingle(f, language, outputFolder));
+				Future<?> completionHandle = newFixedThreadPool.submit(() -> processSingle(f, language, outputFolder,globalOptions));
 				completionHandles.add(completionHandle);
 			}
 
@@ -81,28 +91,35 @@ public class Main {
 		}
 	}
 
-	private static void processSingle(File f, String language, String outputFolder) {
+	private static void processSingle(File f, String language, String outputFolder,Map<String,String> globalOptions) {
 		try {
 
 			System.out.println("Processing of " + f.getAbsolutePath() + " started.");
 			TopicsFileParser parser = new TopicsFileParser(f);
 			parser.parseTopicsFile();
+			
+			Map<String,String> options = new HashMap<>(globalOptions);
+			options.putAll(parser.getOptions());
+			
 			switch (language) {
 			case "cpp": {
 				CppGenerator generator = new CppGenerator();
-				String generateCppFile = generator.generateCppFile(parser.getRoot(), parser.getOptions());
+				String generateCppFile = generator.generateCppFile(parser.getRoot(), options);
+				System.out.println(generateCppFile);
+				// FIXME
 				File outDir = new File(outputFolder + File.separator);
 				outDir.mkdirs();
-				File outFile = new File(outDir.getAbsoluteFile() + File.separator + getCppOutFileName(parser.getOptions(), parser.getRoot()));
+				File outFile = new File(outDir.getAbsoluteFile() + File.separator + getCppOutFileName(options, parser.getRoot()));
 				Files.write(outFile.toPath(), generateCppFile.getBytes(StandardCharsets.UTF_8));
 				break;
 			}
 			case "java": {
 				JavaGenerator generator = new JavaGenerator();
-				String generateCppFile = generator.generateJavaFile(parser.getRoot(), parser.getOptions());
+				String generateCppFile = generator.generateJavaFile(parser.getRoot(), options);
+				System.out.println(generateCppFile);
 				File outDir = new File(outputFolder + File.separator);
 				outDir.mkdirs();
-				File outFile = new File(outDir.getAbsoluteFile() + File.separator + getJavaOutFileName(parser.getOptions(), parser.getRoot()));
+				File outFile = new File(outDir.getAbsoluteFile() + File.separator + getJavaOutFileName(options, parser.getRoot()));
 				Files.write(outFile.toPath(), generateCppFile.getBytes(StandardCharsets.UTF_8));
 				break;
 			}

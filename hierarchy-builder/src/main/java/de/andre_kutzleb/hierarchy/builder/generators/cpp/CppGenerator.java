@@ -70,13 +70,14 @@ public class CppGenerator {
 
 		ST clazz = getBuilderClassTemplate(node.isRoot);
 
+		clazz.add("mainClassName", node.getRoot().data.getName());
 		clazz.add("className", node.data.getName());
 
 		for (Node<BaseEntry> child : node.children) {
 			String subClass = fillRecursive(child, insideNamespace);
 			clazz.add("subClass", subClass);
 			clazz.add("subClassField", subClassField(child.data));
-			fillSubClassGetters(clazz, child.data);
+			fillSubClassGetters(clazz, child);
 			fillConstants(insideNamespace, child.data);
 		}
 		return clazz.render();
@@ -98,28 +99,29 @@ public class CppGenerator {
 		}
 	}
 
-	private void fillSubClassGetters(ST clazz, BaseEntry entry) {
+	private void fillSubClassGetters(ST clazz, Node<BaseEntry> node) {
 
-		// TODO in definition file: concatenate instead of 3 different versions
-		if (entry instanceof ConstantValueEntry) {
+		if (node.data instanceof ConstantValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterConst");
-			subClassGetter.add("class", entry.getName());
-			subClassGetter.add("name", entry.getLowerCaseName());
-			subClassGetter.add("constantName", ((ConstantValueEntry) entry).getConstantValueName());
+			subClassGetter.add("class", node.data.getName());
+			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("mainClassName", node.getRoot().data.getName());
+			subClassGetter.add("constantName", ((ConstantValueEntry) node.data).getConstantValueName());
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
-		if (entry instanceof CustomValueEntry) {
+		if (node.data instanceof CustomValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterCustom");
-			subClassGetter.add("class", entry.getName());
-			subClassGetter.add("name", entry.getLowerCaseName());
-			subClassGetter.add("paramType", entry.getDataType().cppName);
+			subClassGetter.add("class", node.data.getName());
+			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("paramType", node.data.getDataType().cppName);
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
-		if (entry instanceof DefaultValueEntry) {
+		if (node.data instanceof DefaultValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterDefault");
-			subClassGetter.add("class", entry.getName());
-			subClassGetter.add("name", entry.getLowerCaseName());
-			subClassGetter.add("constantName", ((DefaultValueEntry) entry).getDefaultValueName());
+			subClassGetter.add("class", node.data.getName());
+			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("mainClassName", node.getRoot().data.getName());
+			subClassGetter.add("constantName", ((DefaultValueEntry) node.data).getDefaultValueName());
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
 	}
@@ -131,6 +133,7 @@ public class CppGenerator {
 
 		ST insideNamespace = this.templates.getInstanceOf("InsideNamespace");
 		insideNamespace.add("constant", constant(DATA_TYPE.uint32_t.cppName, "BUFFER_SIZE", getBufferSize(options)));
+		insideNamespace.add("className", root.data.getName());
 		insideNamespace.add("builder", fillRecursive(root, insideNamespace));
 
 		List<String> namespacesReverse = getNamespacesReverse(options);
@@ -164,13 +167,33 @@ public class CppGenerator {
 	}
 
 	private List<String> getNamespacesReverse(Map<String, String> options) {
-		String namespaces = options.get("cpp_namespace");
-		if (namespaces == null) {
+		String inner = options.get("cpp_inner_namespace");
+		String outer = options.get("cpp_outer_namespace");
+
+		String innerNamespaces = inner == null ? "" : inner;
+		String outerNamespaces = outer == null ? "" : outer;
+
+		boolean innerAvail = !innerNamespaces.isEmpty();
+		boolean outerAvail = !outerNamespaces.isEmpty();
+		boolean bothAvail = innerAvail && outerAvail;
+		boolean anyAvail = innerAvail || outerAvail;
+
+		if (!anyAvail) {
 			return Collections.emptyList();
-		} else {
-			List<String> asList = Arrays.asList(namespaces.split(Pattern.quote("::")));
-			Collections.reverse(asList);
-			return asList;
 		}
+
+		String allNamespaces;
+		if (bothAvail) {
+			allNamespaces = outerNamespaces + "::" + innerNamespaces;
+		} else if (innerAvail) {
+			allNamespaces = innerNamespaces;
+		} else {
+			allNamespaces = outerNamespaces;
+		}
+
+		List<String> asList = Arrays.asList(allNamespaces.split(Pattern.quote("::")));
+		Collections.reverse(asList);
+		return asList;
+
 	}
 }

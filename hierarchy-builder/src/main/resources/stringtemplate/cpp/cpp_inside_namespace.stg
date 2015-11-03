@@ -1,24 +1,24 @@
-InsideNamespace (constant,builder) ::= <<
+InsideNamespace (className,constant,builder) ::= <<
 
-class Constants {
+class $className$TopicsConstants {
 public :
     $constant; separator="\n"$
 };
 
 template<class T>
-class Appender {
+class $className$TopicsAppender {
     bool delBuf;
 protected:
     uint8_t* buf;
     size_t* currentSize;
 
-    Appender() : buf(new uint8_t[Constants::BUFFER_SIZE]),currentSize(new size_t(0)), delBuf(true) {}
+    $className$TopicsAppender() : buf(new uint8_t[$className$TopicsConstants::BUFFER_SIZE]),currentSize(new size_t(0)), delBuf(true) {}
 
 public:
 
-    Appender(uint8_t* buf, size_t* currentSize) : buf(buf),currentSize(currentSize), delBuf(false) {}
+    $className$TopicsAppender(uint8_t* buf, size_t* currentSize) : buf(buf),currentSize(currentSize), delBuf(false) {}
 
-    ~Appender() {
+    ~$className$TopicsAppender() {
         if (delBuf) {
             delete[] buf;
             delete currentSize;
@@ -26,9 +26,9 @@ public:
     }
 
     template<class R>
-    Appender<T>& append(R val) {
+    $className$TopicsAppender<T>& append(R val) {
         size_t sizeOfType = sizeof(val);
-        if((*currentSize + sizeOfType) >= Constants::BUFFER_SIZE) {
+        if((*currentSize + sizeOfType) >= $className$TopicsConstants::BUFFER_SIZE) {
             throw std::runtime_error("appending given type would exceed buffer size of Builder");
         }
         for (; sizeOfType > 0; sizeOfType--) {

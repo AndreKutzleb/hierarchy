@@ -73,7 +73,7 @@ public class JavaGenerator {
 			String subClass = fillRecursive(child, insideNamespace);
 			clazz.add("subClass", subClass);
 			clazz.add("subClassField", subClassField(child.data));
-			fillSubClassGetters(clazz, child.data);
+			fillSubClassGetters(clazz, child);
 			fillConstants(insideNamespace, child.data);
 		}
 		return clazz.render();
@@ -90,27 +90,29 @@ public class JavaGenerator {
 		}
 	}
 
-	private void fillSubClassGetters(ST clazz, BaseEntry entry) {
+	private void fillSubClassGetters(ST clazz, Node<BaseEntry> node) {
 
-		if (entry instanceof ConstantValueEntry) {
+		if (node.data instanceof ConstantValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterConst");
-			subClassGetter.add("class", entry.getName());
-			subClassGetter.add("name", entry.getLowerCaseName());
-			subClassGetter.add("constantName", ((ConstantValueEntry) entry).getConstantValueName());
+			subClassGetter.add("class", node.data.getName());
+			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("constantName", ((ConstantValueEntry) node.data).getConstantValueName());
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
-		if (entry instanceof CustomValueEntry) {
+		
+		if (node.data instanceof CustomValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterCustom");
-			subClassGetter.add("class", entry.getName());
-			subClassGetter.add("name", entry.getLowerCaseName());
-			subClassGetter.add("paramType", entry.getDataType().javaName);
+			subClassGetter.add("class", node.data.getName());
+			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("paramType", node.data.getDataType().javaName);
+
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
-		if (entry instanceof DefaultValueEntry) {
+		if (node.data instanceof DefaultValueEntry) {
 			ST subClassGetter = templates.getInstanceOf("SubClassGetterDefault");
-			subClassGetter.add("class", entry.getName());
-			subClassGetter.add("name", entry.getLowerCaseName());
-			subClassGetter.add("constantName", ((DefaultValueEntry) entry).getDefaultValueName());
+			subClassGetter.add("class", node.data.getName());
+			subClassGetter.add("name", node.data.getLowerCaseName());
+			subClassGetter.add("constantName", ((DefaultValueEntry) node.data).getDefaultValueName());
 			clazz.add("subClassGetter", subClassGetter.render());
 		}
 	}
