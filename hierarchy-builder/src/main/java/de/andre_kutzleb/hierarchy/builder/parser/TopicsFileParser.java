@@ -31,15 +31,22 @@ import de.andre_kutzleb.hierarchy.builder.parser.antlr4.TopicsParser.OptionConte
 
 public class TopicsFileParser {
 
-	private final String fileName;
-	private final String fileNameWithoutEnding;
-	private final String readFile;
-
-	private final Map<String, String> options = new HashMap<>();
-	private Node<BaseEntry> root = null;
-
 	private enum ENTRY_TYPE {
 		CONSTANT_VALUE, CUSTOM_WITHOUT_DEFAULT_VALUE, CUSTOM_WITH_DEFAULT_VALUE
+
+	}
+	private final String fileName;
+	private final String fileNameWithoutEnding;
+
+	private final String readFile;
+	private final Map<String, String> options = new HashMap<>();
+
+	private Node<BaseEntry> root = null;
+
+	public TopicsFileParser(File inputFile) throws IOException {
+		fileName = inputFile.getName();
+		fileNameWithoutEnding = inputFile.getName().split(Pattern.quote("."))[0].trim();
+		readFile = parseFileAndMarkIndent(new FileInputStream(inputFile));
 
 	}
 
@@ -50,11 +57,41 @@ public class TopicsFileParser {
 		readFile = parseFileAndMarkIndent(streamOfFile);
 	}
 
-	public TopicsFileParser(File inputFile) throws IOException {
-		fileName = inputFile.getName();
-		fileNameWithoutEnding = inputFile.getName().split(Pattern.quote("."))[0].trim();
-		readFile = parseFileAndMarkIndent(new FileInputStream(inputFile));
+	private String buildConstantName(Node<BaseEntry> node) {
+		return node.isRoot ? "" : buildConstantName(node.parent) + node.data.getName() + "__";
+	}
 
+	private DATA_TYPE determineDataType(String value) {
+		switch (value.length()) {
+		case 2:
+			return DATA_TYPE.uint8_t;
+		case 4:
+			return DATA_TYPE.uint16_t;
+		case 8:
+			return DATA_TYPE.uint32_t;
+		case 16:
+			return DATA_TYPE.uint64_t;
+		default:
+			throw new IllegalArgumentException("for input \"" + value + "\": hex numbers needs 2, 4, 8 or 16 digits in order to be mapped to uint8, uint16, uint32, uint64");
+		}
+	}
+
+	private ENTRY_TYPE determineEntryType(TopicsParser.TopicLineContext ctx) {
+		if (ctx.assigned.custom() == null) {
+			return ENTRY_TYPE.CONSTANT_VALUE;
+		} else if (ctx.assigned.custom().HexIntegerLiteral() == null) {
+			return ENTRY_TYPE.CUSTOM_WITHOUT_DEFAULT_VALUE;
+		} else {
+			return ENTRY_TYPE.CUSTOM_WITH_DEFAULT_VALUE;
+		}
+	}
+
+	public Map<String, String> getOptions() {
+		return options;
+	}
+
+	public Node<BaseEntry> getRoot() {
+		return root;
 	}
 
 	private String parseFileAndMarkIndent(InputStream fromFile) throws IOException {
@@ -183,43 +220,6 @@ public class TopicsFileParser {
 		p.topics();
 
 		this.root = trunk;
-	}
-
-	private String buildConstantName(Node<BaseEntry> node) {
-		return node.isRoot ? "" : buildConstantName(node.parent) + node.data.getName() + "__";
-	}
-
-	private DATA_TYPE determineDataType(String value) {
-		switch (value.length()) {
-		case 2:
-			return DATA_TYPE.uint8_t;
-		case 4:
-			return DATA_TYPE.uint16_t;
-		case 8:
-			return DATA_TYPE.uint32_t;
-		case 16:
-			return DATA_TYPE.uint64_t;
-		default:
-			throw new IllegalArgumentException("for input \"" + value + "\": hex numbers needs 2, 4, 8 or 16 digits in order to be mapped to uint8, uint16, uint32, uint64");
-		}
-	}
-
-	private ENTRY_TYPE determineEntryType(TopicsParser.TopicLineContext ctx) {
-		if (ctx.assigned.custom() == null) {
-			return ENTRY_TYPE.CONSTANT_VALUE;
-		} else if (ctx.assigned.custom().HexIntegerLiteral() == null) {
-			return ENTRY_TYPE.CUSTOM_WITHOUT_DEFAULT_VALUE;
-		} else {
-			return ENTRY_TYPE.CUSTOM_WITH_DEFAULT_VALUE;
-		}
-	}
-
-	public Node<BaseEntry> getRoot() {
-		return root;
-	}
-
-	public Map<String, String> getOptions() {
-		return options;
 	}
 
 }
