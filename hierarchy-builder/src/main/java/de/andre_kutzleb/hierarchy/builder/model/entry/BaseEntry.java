@@ -7,21 +7,7 @@ package de.andre_kutzleb.hierarchy.builder.model.entry;
 public class BaseEntry {
 
 	public enum DATA_TYPE {
-		uint8_t("byte", "uint8_t", "appendMatch8"), uint16_t("short", "uint16_t", "appendMatch16"), uint32_t("int", "uint32_t", "appendMatch32"), uint64_t("long", "uint64_t", "appendMatch64");
-
-		public final String javaName;
-		public final String cppName;
-		public final String appendFunctionName;
-
-		DATA_TYPE(String javaName, String cppName, String appendFunctionName) {
-			this.javaName = javaName;
-			this.cppName = cppName;
-			this.appendFunctionName = appendFunctionName;
-		};
-
-		public String javaNameCamelCase() {
-			return javaName.substring(0, 1).toUpperCase() + javaName.substring(1);
-		}
+		uint8_t, uint16_t, uint32_t, uint64_t
 	}
 
 	private final DATA_TYPE dataType;
@@ -34,12 +20,16 @@ public class BaseEntry {
 		this.comment = comment;
 	}
 
+	public String getComment() {
+		return comment;
+	}
+
 	public DATA_TYPE getDataType() {
 		return dataType;
 	}
 
-	public String getComment() {
-		return comment;
+	public String getLowerCaseName() {
+		return name.toLowerCase();
 	}
 
 	public String getName() {
@@ -54,10 +44,6 @@ public class BaseEntry {
 	// public String getUpperCaseName() {
 	// return name.toUpperCase();
 	// }
-
-	public String getLowerCaseName() {
-		return name.toLowerCase();
-	}
 
 	// public String getGetterName() {
 	// return name.toLowerCase();
