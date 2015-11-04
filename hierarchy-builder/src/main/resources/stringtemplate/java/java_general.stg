@@ -2,20 +2,8 @@ Constant(type,name,value) ::= "private static final $type$ $name$ = ($type$) $va
 
 SubClassField(class,name) ::= "private final $class$ $name$_ = new $class$();"
 
-SubClassGetterConst(class,name,constantName) ::= <<
-public $class$ $name$() {
-    this.append(Constants.$constantName$);
-    return $name$_;
-}>>
-
-SubClassGetterDefault(class,name,constantName) ::= <<
-public $class$ $name$_default() {
-    this.append(Constants.$constantName$);
-    return $name$_;
-}>>
-
-SubClassGetterCustom(class,name,paramType) ::= <<
-public $class$ $name$($paramType$ val) {
-    this.append(val);
+SubClassGetter(class,mainClassName,name,defaultt,constantName,paramType) ::= <<
+public $class$ $name$$defaultt$($if(paramType)$$paramType$ val$endif$) {
+    this.append($if(constantName)$Constants.$constantName$$elseif(paramType)$val$endif$);
     return $name$_;
 }>>
